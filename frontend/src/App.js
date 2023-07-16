@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from 'react';
 import FileBase64 from 'react-file-base64';
-// import { createItem, getItems } from './functions';
+import { jsPDF } from "jspdf";
 import './App.css';
 import {
   Button,
@@ -16,8 +16,7 @@ import axios from 'axios';
 
 function App() {
   const url = "http://localhost:5000/items";
-  // const getItems = () => axios.get(url);
-  // const createItem = (item) => axios.post(url, item);
+
   const [item, setItem] = useState({
     'name': '',
     'title': '',
@@ -55,12 +54,21 @@ function App() {
 
   const createItem = async (item) => {
     try {
+      //Download PDF card
+      const card = new jsPDF('portrait', 'pt', 'a4');
+      card.html(document.querySelector('#pdfCard')).then(() => {
+        card.save('bussiness-card.pdf');
+      });
+
+      //Save to mongoDB
       const { data } = await axios.post(url, item);
       return data
     } catch (error) {
       console.log(error)
     }
   }
+
+
   return (
     <div className="App">
       <h1 style={{
@@ -86,10 +94,20 @@ function App() {
               onDone={({ base64 }) => setItem({ ...item, image: base64 })}
             /></div>
 
+
         </form>
+
+        <div style={{
+          display: "flex",
+          flexDirection: "column",
+              alignItems: "center"}}>
         {items?.map(item => (
 
-          <div className="card" key={item._id} style={{ border: '3px solid #1976d2', margin: '5px' }}>
+          <div id="pdfCard" className="card" key={item._id} style={{
+            border: '3px solid #1976d2', margin: '5px',
+            width: "20rem"
+
+          }}>
             <p>{item.name}</p>
             <p>{item.phone}</p>
             <p>{item.type}</p>
@@ -101,8 +119,8 @@ function App() {
               height: '100px'
             }} src={item.image} />
           </div>
-        ))}
-      </div></div>
+        ))}</div>
+    </div></div >
   );
 }
 
