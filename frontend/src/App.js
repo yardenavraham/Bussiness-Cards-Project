@@ -15,8 +15,10 @@ import axios from 'axios';
 
 
 function App() {
+
   const url = "http://localhost:5000/items";
 
+  //useStates
   const [item, setItem] = useState({
     'name': '',
     'title': '',
@@ -26,18 +28,8 @@ function App() {
     'site': ''
   });
   const [items, setItems] = useState([])
-  const [isDownload, setIsDownload] = useState(false);
 
-  useEffect(() => {
-
-  }, [isDownload])
-
-  const onSubmitHandler = async (e) => {
-    e.preventDefault();
-    const result = await createItem(item);
-
-    setItems([...items, result]);
-  }
+  //useEffect
 
   useEffect(() => {
     const fetchData = async () => {
@@ -48,6 +40,14 @@ function App() {
     fetchData()
   }, [])
 
+  //Functions
+
+  const onSubmitHandler = async (e) => {
+    e.preventDefault();
+    const result = await createItem(item);
+
+    setItems([...items, result]);
+  }
 
   const getItems = async () => {
     try {
@@ -58,26 +58,22 @@ function App() {
     }
   }
 
-
-
   const createItem = async (item) => {
     try {
+      
       //Download PDF card
 
       var doc = new jsPDF()
 
       var startY = 10; // Starting Y position for text and image
 
-      // Add text to the PDF
       doc.text(item.name + '\n' + item.phone + '\n' + item.type + '\n' + item.email + '\n' + item.site, 10, startY);
 
-      // Load the image
       var img = new Image();
       img.src = item.image;
 
       // Wait for the image to load
       img.addEventListener('load', function () {
-        // Add the image to the PDF
         doc.addImage(img, 'PNG', 10, startY + 30, 50, 50); // Adjust the coordinates and size as per your requirements
 
         // Save the PDF
